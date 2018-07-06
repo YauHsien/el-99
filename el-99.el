@@ -159,3 +159,23 @@
 		(encode_direct (cdr list) (cons 2 acc1) acc2))
 	       (t
 		(encode_direct (cdr list) (car list) (cons acc1 acc2)))))))
+
+;; Duplicate the elements of a list.
+;; (equal (dupli '(a b c)) '(a a b b c c))
+;; Duplicate the elements of a list a given number of times.
+;; (equal (dupli '(a b c) 3) '(a a a b b b c c c))
+(defun dupli (list &optional times acc1 acc2)
+  (cond ((eq times nil)
+	 (cond ((eq list nil) (my_reverse acc1))
+	       (t (dupli (cdr list) times (cons (car list) (cons (car list) acc1))))))
+	(t
+	 (cond ((and (eq list nil) (eq acc1 nil))
+		(my_reverse (append acc1 acc2)))
+	       ((eq acc1 nil)
+		(dupli (cdr list) times (list (car list)) acc2))
+	       (t
+		(cond ((>= (number_of_elements acc1) times)
+		       (dupli list times nil (append acc1 acc2)))
+		      (t
+		       (dupli list times (cons (car acc1) acc1) acc2))))))))
+

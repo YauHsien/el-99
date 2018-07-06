@@ -134,3 +134,28 @@
 	       (t
 		(decode (cons (cons (- (caar list) 1) (cdar list)) (cdr list)) (cons (cdar list) acc)))))
 	(t (decode (cdr list) (cons (car list) acc)))))
+
+;; Run-length encoding of a list (direct solution).
+;; (eq (encode_direct nil) nil)
+;; (equal (encode_direct 'a) nil) ;error (wrong-type-argument listp a)
+;; (equal (encode_direct '(a)) '(a))
+;; (equal (encode_direct '(a a)) '((2 . a)))
+;; (equal (encode_direct '(a a a a b c c a a d e e e e)) '((4 . a) b (2 . c) (2 . a) d (4 . e)))
+(defun encode_direct (list &optional acc1 acc2)
+  (cond ((eq list nil)
+	 (cond ((eq acc1 nil)
+		(my_reverse acc2))
+	       (t
+		(my_reverse (cons acc1 acc2)))))
+	((eq acc1 nil)
+	 (encode_direct (cdr list) (car list) acc2))
+	((listp acc1)
+	 (cond ((eq (car list) (cdr acc1))
+		(encode_direct (cdr list) (cons (+ (car acc1) 1) (cdr acc1)) acc2))
+	       (t
+		(encode_direct (cdr list) (car list) (cons acc1 acc2)))))
+	(t
+	 (cond ((eq (car list) acc1)
+		(encode_direct (cdr list) (cons 2 acc1) acc2))
+	       (t
+		(encode_direct (cdr list) (car list) (cons acc1 acc2)))))))

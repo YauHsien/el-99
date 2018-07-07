@@ -229,3 +229,23 @@
 	 (defun remove_between (list)
 	   (list (car list) (cdr (cadr list))))
 	 (my_flatten (remove_between (split list (- n 1)))))))
+
+;; Insert an element at a given position into a list.
+;; (equal (insert_at 'alpha '(a b c d) 0) '(alpha a b c d))
+;; (equal (insert_at 'alpha '(a b c d) 1) '(alpha a b c d))
+;; (equal (insert_at 'alpha '(a b c d) 2) '(a alpha b c d))
+;; (equal (insert_at 'alpha '(a b c d) 5) '(a b c d alpha))
+;; (equal (insert_at 'alpha '(a b c d) 6) '(a b c d alpha))
+(defun insert_at (elm list pos &optional acc)
+  (cond ((<= pos 1) (my_flatten (list (my_reverse acc) elm list)))
+	(t (insert_at elm (cdr list) (- pos 1) (cons (car list) acc)))))
+
+;; Create a list containing all integers within a given range.
+;; (eq (range 'a 1) nil)
+;; (eq (range 1 -1) nil)
+;; (equal (range 4 9) '(4 5 6 7 8 9))
+(defun range (m n &optional acc)
+  (cond ((or (not (integerp m)) (not (integerp n))) nil)
+	((> m n) acc)
+	(t (range m (- n 1) (cons n acc)))))
+

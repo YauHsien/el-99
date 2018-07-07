@@ -179,3 +179,53 @@
 		      (t
 		       (dupli list times (cons (car acc1) acc1) acc2))))))))
 
+;; Drop every N'th element from a list.
+;; (eq (drop nil 1000) nil)
+;; (equal (drop '(a b c d e f g h i k) 3) '(a b d e g h k))
+;; (equal (drop '(a b c d e f g h i k) 1) nil)
+;; (equal (drop '(a b c d e f g h i k) 2) '(a c e g i))
+;; (equal (drop '(a b c d e f g h i k) 0) '(a b c d e f g h i k))
+(defun drop (list n &optional acc1 acc2)
+  (defun inc (n) (+ 1 n))
+  (cond ((eq list nil) (my_reverse (my_flatten (cons acc1 acc2))))
+	((= (inc (number_of_elements acc1)) n) (drop (cdr list) n nil (cons acc1 acc2)))
+	(t (drop (cdr list) n (cons (car list) acc1) acc2))))
+
+;; Split a list into two parts; the length of the first part is given.
+;; (eq (split nil 1000) nil)
+;; (equal (split '(a b c d e f g h i k) 3) '((a b c) (d e f g h i k)))
+;; (equal (split '(a b c d e f g h i k) -1) '(nil (a b c d e f g h i k)))
+;; (equal (split '(a b c d e f g h i k) 0) '(nil (a b c d e f g h i k)))
+;; (equal (split '(a b c d e f g h i k) 1) '((a) (b c d e f g h i k)))
+(defun split (list n &optional acc)
+  (cond ((< (number_of_elements acc) n) (split (cdr list) n (cons (car list) acc)))
+	(t (list (my_reverse acc) list))))
+
+;; Extract a slice from a list.
+;; (eq (slice nil 7 3) nil)
+;; (equal (slice '(a b c d e f g h i k) 3 7) '(c d e f g))
+;; (equal (slice '(a b c d e f g h i k) 7 3) nil)
+;; (equal (slice '(a b c d e f g h i k) 2 2) '(b))
+;; (equal (slice '(a b c d e f g h i k) 1 -1) nil)
+(defun slice (list m n)
+  (cond ((< m 1) (slice list 1 n))
+	(t (car (split (cadr (split list (- m 1))) (+ 1 (- n m)))))))
+
+;; Rotate a list N places to the left.
+;; (equal (rotate '(a b c d e f g h) 3) '(d e f g h a b c))
+;; (equal (rotate '(a b c d e f g h) -2) '(g h a b c d e f))
+(defun rotate (list n)
+  (cond ((zerop n) list)
+	((< n 1) (rotate list (+ (number_of_elements list) n)))
+	(t (my_flatten (my_reverse (split list n))))))
+
+;; Remove the K'th element from a list.
+;; (equal (remove_at '(a b c d) 2) '(a c d))
+;; (equal (remove_at '(a b c d) 1) '(b c d))
+;; (equal (remove_at '(a b c d) 5) '(a b c d))
+(defun remove_at (list n)
+  (cond ((or (zerop n) (< n 0)) list)
+	(t
+	 (defun remove_between (list)
+	   (list (car list) (cdr (cadr list))))
+	 (my_flatten (remove_between (split list (- n 1)))))))

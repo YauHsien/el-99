@@ -268,8 +268,8 @@
   (rnd_select list (number_of_elements list)))
 
 ;; Generate the combinations of K distinct objects from the N elements of a list.
-;; (number_of_elements (my_reverse (combination 3 '(a b c d e f)))) !! 216!!
-;; (combination 2 '(a b c))
+;; (equal (combination 3 '(a b c d e f)) '((a b c) (a b d) (a b e) (a b f) (a c d) (a c e) (a c f) (a d e) (a d f) (a e f) (b c d) (b c e) (b c f) (b d e) (b d f) (b e f) (c d e) (c d f) (c e f) (d e f)))
+;; (equal (combination 2 '(a b c)) '((a b) (a c) (b c)))
 
 (defun combination (n list &optional indices acc)
   
@@ -278,7 +278,8 @@
 	  (t (create (- length 1) (cond ((eq nil acc) (list 1)) (t (cons (+ 1 (car acc)) acc)))))))
   
   (defun drop_ends (list n)
-    (cond ((>= (car list) n) (drop_ends (cdr list) (- n 1)))
+    (cond ((eq list nil) nil)
+	  ((>= (car list) n) (drop_ends (cdr list) (- n 1)))
 	  (t list)))
   
   (defun rewind (list length)
@@ -304,4 +305,3 @@
 		      (cons (my_reverse (map (lambda (i) (nth (- i 1) list)) indices)) acc))) ; put a combination
 	(t
 	 (combination n list (rewind (next_step indices) n) acc))))
-

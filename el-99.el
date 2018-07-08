@@ -249,3 +249,59 @@
 	((> m n) acc)
 	(t (range m (- n 1) (cons n acc)))))
 
+;; Extract a given number of randomly selected elements from a list.
+;; (= (number_of_elements (rnd_select '(a b c d e f g h) 3)) e)
+(defun rnd_select (list n &optional acc)
+  (cond ((>= (number_of_elements acc) n) acc)
+	(t
+	 (setq i (random (number_of_elements list)))
+	 (rnd_select (remove_at list (+ i 1)) n (cons (nth i list) acc)))))
+
+;; Lotto: Draw N different random numbers from the set 1..M.
+;; (= (number_of_elements (lotto 6 49)) 6)
+(defun lotto (m n)
+  (rnd_select (range 1 n) m))
+
+;; Generate a random permutation of the elements of a list.
+;; (rnd_permu '(a b c d e f))
+(defun rnd_permu (list)
+  (rnd_select list (number_of_elements list)))
+
+;; Generate the combinations of K distinct objects from the N elements of a list.
+;; (number_of_elements (my_reverse (combination 3 '(a b c d e f)))) !! 216!!
+;; (combination 2 '(a b c))
+
+(defun combination (n list &optional indices acc)
+  
+  (defun create (length &optional acc)
+    (cond ((<= length 0) acc)
+	  (t (create (- length 1) (cond ((eq nil acc) (list 1)) (t (cons (+ 1 (car acc)) acc)))))))
+  
+  (defun drop_ends (list n)
+    (cond ((>= (car list) n) (drop_ends (cdr list) (- n 1)))
+	  (t list)))
+  
+  (defun rewind (list length)
+    (cond ((>= (number_of_elements list) length) list)
+	  (t (rewind (cons (+ 1 (car list)) list) length))))
+  
+  (defun next_step (list)
+    (cons (+ 1 (car list)) (cdr list)))
+
+  (defun map (func args &optional acc)
+    (cond ((eq args nil) (my_reverse acc))
+	  (t (map func (cdr args) (cons (apply func (list (car args))) acc)))))
+
+  (setq length (number_of_elements list))
+  (cond ((eq indices nil)
+	 (combination n list (create n) acc)) ; initial
+	((> (car indices) length)
+	 (setq state (drop_ends indices length))
+	 (cond ((eq state nil) (my_reverse acc)) ; result
+	       (t (combination n list state acc)))) ; step back
+	((= (number_of_elements indices) n)
+	 (combination n list (next_step indices)
+		      (cons (my_reverse (map (lambda (i) (nth (- i 1) list)) indices)) acc))) ; put a combination
+	(t
+	 (combination n list (rewind (next_step indices) n) acc))))
+
